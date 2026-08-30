@@ -1,26 +1,29 @@
 package com.example.backendNonLiue.model;
 
-import com.example.backendNonLiue.util.Regra;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import lombok.AccessLevel;
+import com.example.backendNonLiue.util.Role;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-import java.util.UUID;
-
-@Entity
 @Getter
 @Setter
-public class User {
-    @Id
-    @GeneratedValue
-    @Setter(AccessLevel.NONE)
-    private UUID id;
+@Entity
+@Table(name = "tb_users")
+public class User extends BaseEntity {
 
-    private String nome;
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false, unique = true)
     private String email;
-    private String password;
-    private Regra role;
+
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+
+    @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(nullable = false)
+    private Role role;
 }
