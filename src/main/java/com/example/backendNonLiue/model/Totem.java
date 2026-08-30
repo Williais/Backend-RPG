@@ -16,8 +16,6 @@ public class Totem extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
-    private String type;
-
     @Column(columnDefinition = "TEXT")
     private String description;
 

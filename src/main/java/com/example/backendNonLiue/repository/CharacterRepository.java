@@ -1,6 +1,6 @@
 package com.example.backendNonLiue.repository;
 
-
+import com.example.backendNonLiue.model.Character;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.UUID;
