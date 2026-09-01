@@ -3,13 +3,18 @@ package com.example.backendNonLiue.controllers;
 import com.example.backendNonLiue.dto.DamageReq;
 import com.example.backendNonLiue.dto.JoinSessionReq;
 import com.example.backendNonLiue.dto.PlayerStatusSyncRes;
+import com.example.backendNonLiue.dto.session.AttackReq;
 import com.example.backendNonLiue.dto.session.DiceRollMessage;
+import com.example.backendNonLiue.dto.session.GameLogRes;
 import com.example.backendNonLiue.dto.session.SessionRes;
+import com.example.backendNonLiue.model.Character;
 import com.example.backendNonLiue.model.GameSession;
 import com.example.backendNonLiue.model.SessionPlayer;
 import com.example.backendNonLiue.model.User;
+import com.example.backendNonLiue.repository.CharacterRepository;
 import com.example.backendNonLiue.repository.GameSessionRepository;
 import com.example.backendNonLiue.repository.UserRepository;
+import com.example.backendNonLiue.service.DiceEngineService;
 import com.example.backendNonLiue.service.SessionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,8 +35,10 @@ public class SessionController {
     private final SimpMessagingTemplate messagingTemplate;
     private final GameSessionRepository sessionRepository;
     private final UserRepository userRepository;
+    private final CharacterRepository characterRepository;
+    private final DiceEngineService diceEngine;
 
-    @PostMapping("/api/sessions")
+    @PostMapping
     public ResponseEntity<SessionRes> createSession(Authentication auth) {
         User master = userRepository.findByEmail(auth.getName()).orElseThrow(RuntimeException::new);
 
@@ -76,6 +83,18 @@ public class SessionController {
         );
 
         messagingTemplate.convertAndSend("/topic/session/" + sessionId, syncData);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{sessionId}/attack")
+    public ResponseEntity<Void> executeAttack(@PathVariable UUID sessionId, @RequestBody AttackReq req) {
+        Character attacker = characterRepository.findById(req.characterId()).orElseThrow(RuntimeException::new);
+
+        int damageRolled = diceEngine.rollDice(10);
+        String narrative = "usou sua habilidade e causou " + damageRolled + " de dano!";
+        GameLogRes logMessage = new GameLogRes(attacker.getName(), narrative, damageRolled);
+
+        messagingTemplate.convertAndSend("/topic/session/" + sessionId + "/log", logMessage);
         return ResponseEntity.ok().build();
     }
 }

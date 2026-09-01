@@ -20,6 +20,8 @@ public class Skill {
     private UUID id;
 
     private String name;
+
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "effect_type")
@@ -27,6 +29,14 @@ public class Skill {
 
     @Column(name = "effect_value")
     private Integer effectValue;
+
+    @Column(name = "category")
+    private String category;
+    @Column(name = "icon_ref")
+    private String iconRef;
+
+    @Column(name = "damage_dice")
+    private String damageDice;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
